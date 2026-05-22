@@ -20,7 +20,7 @@ const BookFormPage = () => {
   useEffect(() => {
     if (id) {
       axiosInstance
-        .get(`api/books/${id}/`)
+        .get(`api/book/${id}/`)
         .then((res) => {
           setFormData(res.data);
         })

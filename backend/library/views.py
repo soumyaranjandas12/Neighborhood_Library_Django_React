@@ -11,9 +11,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from library.models import Book, BorrowRecord, User
+from .models import Book, BorrowRecord, User
 from rest_framework.pagination import PageNumberPagination
-from library_react.serializers import BookSerializer, CustomLoginSerializer, CustomUserSerializer, \
+from .serializers import BookSerializer, CustomLoginSerializer, CustomUserSerializer, \
     BorrowRecordSerializer, RegisterSerializer
 
 
