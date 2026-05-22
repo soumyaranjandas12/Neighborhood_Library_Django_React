@@ -6,7 +6,6 @@ urlpatterns = [
     path('register/', views.RegisterView.as_view(), name='register'),
     path('reader/<int:pk>/delete/', views.DeleteReaderView.as_view(), name='delete_reader'),
     path('readers/', views.ReadersListView.as_view(), name='list_readers'),
-    path('readers/all/', views.AllReadersListView.as_view(), name='list_all_readers'),
     path('reader/issue_history/', views.ReaderIssuedHistoryView.as_view(), name='list_reader_issue_history'),
 
     # # Book Actions

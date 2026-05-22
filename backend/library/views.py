@@ -168,22 +168,6 @@ class ReadersListView(APIView):
             "results": serializer.data
         })
 
-
-class AllReadersListView(APIView):
-    def get(self, request):
-        if not request.user.is_librarian:
-            return Response(
-                {"error": "Only librarians can perform this action."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        readers = User.objects.all()
-        readers = readers.filter(role=User.Roles.READER)
-        serializer = CustomUserSerializer(readers, many=True)
-        return Response({
-            "results": serializer.data
-        }, status=status.HTTP_200_OK)
-
-
 class IssuedBooksView(APIView):
     def get(self, request):
         issued_books = BorrowRecord.objects.filter(status=BorrowRecord.StatusChoices.BORROWED)

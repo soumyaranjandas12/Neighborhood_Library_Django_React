@@ -42,7 +42,6 @@ const LibrarianDashboard = ({ user }) => {
     fetchReaders();
     fetchBorrowings();
     fetchHistory();
-    fetchAllReaders();
   }, [page, search, readerPage, historyPage]);
 
   const fetchBooks = async () => {
@@ -70,12 +69,6 @@ const LibrarianDashboard = ({ user }) => {
     setTotalPagesReaders(readersPagesCount);
     setReadersPages(Array.from({ length: readersPagesCount }, (_, i) => i + 1));
     setReadersCount(data.count || 0);
-  };
-
-  const fetchAllReaders = async () => {
-    const res = await axiosInstance.get(`/api/readers/all/`);
-    const data = res.data || [];
-    setAllReaders(data.results);
   };
 
   const fetchBorrowings = async () => {
