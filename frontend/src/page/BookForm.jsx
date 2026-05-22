@@ -112,19 +112,19 @@ const BookForm = ({ formData, setFormData, handleSubmit, errors = {} }) => {
 
               {/* Example: Copies */}
               <div className="mb-3">
-                <label className="form-label fw-bold">Available Copies</label>
+                <label className="form-label fw-bold">Total Copies</label>
                 <input
                   type="number"
-                  name="available_copies"
+                  name="total_copies"
                   className={`form-control ${
-                    errors.available_copies ? "is-invalid" : ""
+                    errors.total_copies ? "is-invalid" : ""
                   }`}
-                  value={formData.available_copies || ""}
+                  value={formData.total_copies || ""}
                   onChange={handleChange}
                 />
-                {errors.available_copies && (
+                {errors.total_copies && (
                   <div className="invalid-feedback">
-                    {errors.available_copies}
+                    {errors.total_copies}
                   </div>
                 )}
               </div>

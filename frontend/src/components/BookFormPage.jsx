@@ -8,8 +8,9 @@ const BookFormPage = () => {
     title: "",
     author: "",
     description: "",
+    isbn: "",
     published_date: "",
-    available_copies: "",
+    total_copies: "",
   });
 
   const [errors, setErrors] = useState({});
