@@ -96,41 +96,6 @@ const LibrarianDashboard = ({ user }) => {
     setBorrowHistory(data.results.results || []);
   };
 
-  // 🔥 ISSUE BOOK
-  const issueBook = async (bookId, username) => {
-    try {
-      await axiosInstance.post("/api/issue/", {
-        book_id: bookId,
-        username: username,
-      });
-      setActionError("");
-    } catch (err) {
-      const msg =
-        err.response?.data?.error ||
-        err.response?.data?.detail ||
-        Object.values(err.response?.data || {})[0] ||
-        "Failed to issue book.";
-      setActionError(typeof msg === "string" ? msg : JSON.stringify(msg));
-    }
-    fetchBooks();
-    fetchBorrowings();
-    fetchHistory();
-  };
-
-  const handleSubmit = (e, bookId) => {
-    e.preventDefault();
-
-    if (!selectedReaders) {
-      alert("Please select a reader");
-      return;
-    }
-
-    issueBook(bookId, selectedReaders);
-    fetchBooks();
-    fetchBorrowings();
-    fetchHistory();
-  };
-
   // 🔥 RETURN BOOK
   const returnBook = async (id) => {
     try {
@@ -337,32 +302,6 @@ const LibrarianDashboard = ({ user }) => {
                               View
                             </Link>
                           </div>
-                          <br />
-                          {book.available_copies > 0 && (
-                            <form onSubmit={(e) => handleSubmit(e, book.id)}>
-                              <select
-                                className="form-control"
-                                value={selectedReaders}
-                                onChange={(e) =>
-                                  setSelectedReaders(e.target.value)
-                                }
-                              >
-                                <option>Select Reader</option>
-                                {allReaders.map((r) => (
-                                  <option key={r.id} value={r.username}>
-                                    {r.full_name}
-                                  </option>
-                                ))}
-                              </select>
-                              <br />
-                              <button
-                                type="submit"
-                                className="btn btn-outline-success"
-                              >
-                                Issue Book
-                              </button>
-                            </form>
-                          )}
                         </div>
                       </div>
                     </div>

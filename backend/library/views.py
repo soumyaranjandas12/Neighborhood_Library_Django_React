@@ -248,7 +248,7 @@ class IssueBookView(APIView):
     """View handling the physical allocation of a book copy to a system reader user."""
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_librarian:
+        if not request.user.is_reader:
             return Response(
                 {"error": "Only librarians can perform this action."},
                 status=status.HTTP_403_FORBIDDEN

@@ -18,6 +18,7 @@ const ReaderDashboard = ({ user }) => {
   const [totalPagesHistory, setTotalPagesHistory] = useState(1);
   const [issuedHistoryCount, setIssuedHistoryCount] = useState(0);
   const [fetchError, setFetchError] = useState("");
+  const [actionError, setActionError] = useState("");
 
   // 🔥 Helper (CSRF for Django)
   const getCSRFToken = () => {
@@ -72,6 +73,25 @@ const ReaderDashboard = ({ user }) => {
         "Failed to load history.";
       setFetchError(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
+  };
+
+  const issueBook = async (bookId, username) => {
+    try {
+      await axiosInstance.post("/api/issue/", {
+        book_id: bookId,
+        username: username,
+      });
+      setActionError("");
+    } catch (err) {
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        Object.values(err.response?.data || {})[0] ||
+        "Failed to issue book.";
+      setActionError(typeof msg === "string" ? msg : JSON.stringify(msg));
+    }
+    fetchBooks();
+    fetchHistory();
   };
 
   return (
@@ -201,6 +221,16 @@ const ReaderDashboard = ({ user }) => {
                             >
                               View
                             </Link>
+                            {book.available_copies > 0 && (
+                              <button
+                                onClick={() =>
+                                  issueBook(book.id, user.username)
+                                }
+                                className="btn btn-sm btn-outline-success"
+                              >
+                                Rent Book
+                              </button>
+                            )}
                           </div>
                           <br />
                         </div>
