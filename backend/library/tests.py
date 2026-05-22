@@ -354,31 +354,34 @@ class TestDeleteReaderView:
 class TestIssueBookView:
     url = "/api/issue/"
 
-    def test_librarian_can_issue_book(self, auth_librarian, book, reader):
+    def test_librarian_cannot_issue_book(self, auth_librarian, book, reader):
         resp = auth_librarian.post(self.url, {"book_id": book.pk, "username": reader.username})
+        assert resp.status_code == 403
+
+    def test_reader_can_issue_book(self, auth_reader, book, reader):
+        resp = auth_reader.post(self.url, {"book_id": book.pk, "username": reader.username})
         assert resp.status_code == 200
         book.refresh_from_db()
         assert book.available_copies == book.total_copies - 1
         assert BorrowRecord.objects.filter(user=reader, book=book, status=BorrowRecord.StatusChoices.BORROWED).exists()
+        
 
-    def test_issue_creates_14_day_due_date(self, auth_librarian, book, reader):
-        auth_librarian.post(self.url, {"book_id": book.pk, "username": reader.username})
+    def test_issue_creates_14_day_due_date(self, auth_reader, book, reader):
+        auth_reader.post(self.url, {"book_id": book.pk, "username": reader.username})
         record = BorrowRecord.objects.get(user=reader, book=book)
         expected_due = timezone.now().date() + datetime.timedelta(days=14)
         assert record.due_date == expected_due
 
-    def test_reader_cannot_issue_book(self, auth_reader, book):
-        resp = auth_reader.post(self.url, {"book_id": book.pk, "username": "reader1"})
-        assert resp.status_code == 403
+   
 
-    def test_issue_fails_when_no_copies_available(self, auth_librarian, book, reader):
+    def test_issue_fails_when_no_copies_available(self, auth_reader, book, reader):
         book.available_copies = 0
         book.save()
-        resp = auth_librarian.post(self.url, {"book_id": book.pk, "username": reader.username})
+        resp = auth_reader.post(self.url, {"book_id": book.pk, "username": reader.username})
         assert resp.status_code == 400
 
-    def test_issue_fails_when_reader_already_holds_copy(self, auth_librarian, borrow_record, reader):
-        resp = auth_librarian.post(
+    def test_issue_fails_when_reader_already_holds_copy(self, auth_reader, borrow_record, reader):
+        resp = auth_reader.post(
             self.url, {"book_id": borrow_record.book.pk, "username": reader.username}
         )
         assert resp.status_code == 400
