@@ -34,6 +34,20 @@ class BorrowRecordSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'contact_no', 'role', 'full_name')
-        extra_kwargs = {'password': {'write_only': True}, 'contact_no': {'required': True}, 'role': {'required': True},
-                        'full_name': {'required': True}}
+        fields = ('id', 'username', 'email', 'password', 'contact_no', 'role', 'full_name', 'address')
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'contact_no': {'required': True},
+            'role': {'required': True},
+            'full_name': {'required': True},
+            'address': {'required': False},
+        }
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+
+        user = User(**validated_data)   # create user without password
+        user.set_password(password)    # ✅ hash password
+        user.save()
+
+        return user
