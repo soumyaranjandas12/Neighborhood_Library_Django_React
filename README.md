@@ -336,3 +336,13 @@ pytest --cov=library
 | `/book/:id` | Book Detail | Authenticated |
 | `/create-book` | Book Form | Librarian |
 | `/book/edit/:id` | Book Form (edit) | Librarian |
+
+
+Adding Website Screenshots
+
+<img width="1821" height="776" alt="image" src="https://github.com/user-attachments/assets/eb6e511d-7870-493d-9826-87bdf4ce60bf" />
+<img width="1706" height="792" alt="image" src="https://github.com/user-attachments/assets/21ee0e68-82b6-4ea1-b637-0a5f68a44ebb" />
+<img width="1737" height="875" alt="image" src="https://github.com/user-attachments/assets/2f5a2564-0e64-46a6-93f4-d09947efbdfa" />
+<img width="1742" height="857" alt="image" src="https://github.com/user-attachments/assets/4bad4c18-df50-4798-b3da-800e882da376" />
+<img width="1713" height="911" alt="image" src="https://github.com/user-attachments/assets/80b68aaa-f964-4c38-be03-c4aaeae81084" />
+
