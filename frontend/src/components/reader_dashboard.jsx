@@ -17,6 +17,7 @@ const ReaderDashboard = ({ user }) => {
   const [historyPage, setHistoryPage] = useState(1);
   const [totalPagesHistory, setTotalPagesHistory] = useState(1);
   const [issuedHistoryCount, setIssuedHistoryCount] = useState(0);
+  const [fetchError, setFetchError] = useState("");
 
   // 🔥 Helper (CSRF for Django)
   const getCSRFToken = () => {
@@ -44,7 +45,11 @@ const ReaderDashboard = ({ user }) => {
       setPages(Array.from({ length: pagesCount }, (_, i) => i + 1));
       setBooksCount(data.count || 0);
     } catch (err) {
-      console.error(err);
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        "Failed to load books.";
+      setFetchError(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
   };
 
@@ -61,12 +66,26 @@ const ReaderDashboard = ({ user }) => {
       setIssuedHistoryCount(data.count || 0);
       setBorrowHistory(data.results.results || []); // ⚠️ fix here too
     } catch (err) {
-      console.error(err);
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        "Failed to load history.";
+      setFetchError(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
   };
 
   return (
     <div className="container py-4">
+      {fetchError && (
+        <div className="alert alert-danger alert-dismissible" role="alert">
+          {fetchError}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setFetchError("")}
+          />
+        </div>
+      )}
       {/* HEADER */}
       <div className="d-flex justify-content-between mb-4">
         <h2>Reader Dashboard</h2>

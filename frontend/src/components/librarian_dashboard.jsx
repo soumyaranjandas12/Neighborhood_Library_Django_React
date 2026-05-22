@@ -26,6 +26,7 @@ const LibrarianDashboard = ({ user }) => {
   const [historyPage, setHistoryPage] = useState(1);
   const [totalPagesHistory, setTotalPagesHistory] = useState(1);
   const [issuedHistoryCount, setIssuedHistoryCount] = useState(0);
+  const [actionError, setActionError] = useState("");
 
   // 🔥 Helper (CSRF for Django)
   const getCSRFToken = () => {
@@ -102,10 +103,14 @@ const LibrarianDashboard = ({ user }) => {
         book_id: bookId,
         username: username,
       });
-
-      // optional: refresh books
+      setActionError("");
     } catch (err) {
-      console.error(err);
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        Object.values(err.response?.data || {})[0] ||
+        "Failed to issue book.";
+      setActionError(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
     fetchBooks();
     fetchBorrowings();
@@ -128,7 +133,17 @@ const LibrarianDashboard = ({ user }) => {
 
   // 🔥 RETURN BOOK
   const returnBook = async (id) => {
-    await axiosInstance.post(`/api/return/${id}/`);
+    try {
+      await axiosInstance.post(`/api/return/${id}/`);
+      setActionError("");
+    } catch (err) {
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        Object.values(err.response?.data || {})[0] ||
+        "Failed to return book.";
+      setActionError(typeof msg === "string" ? msg : JSON.stringify(msg));
+    }
     fetchBooks();
     fetchBorrowings();
     fetchHistory();
@@ -137,12 +152,30 @@ const LibrarianDashboard = ({ user }) => {
   const deleteReader = async (id) => {
     try {
       await axiosInstance.post(`/api/reader/${id}/delete/`);
-    } catch (err) {}
+      setActionError("");
+    } catch (err) {
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        Object.values(err.response?.data || {})[0] ||
+        "Failed to delete reader.";
+      setActionError(typeof msg === "string" ? msg : JSON.stringify(msg));
+    }
     fetchReaders();
   };
 
   return (
     <div className="container py-4">
+      {actionError && (
+        <div className="alert alert-danger alert-dismissible" role="alert">
+          {actionError}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setActionError("")}
+          />
+        </div>
+      )}
       {/* HEADER */}
       <div className="d-flex justify-content-between mb-4">
         <h2>Librarian Dashboard</h2>

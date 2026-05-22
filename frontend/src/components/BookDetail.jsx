@@ -9,6 +9,7 @@ const BookDetail = ({ user }) => {
 
   const [book, setBook] = useState(location.state?.book || null);
   const [loading, setLoading] = useState(!book);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -17,8 +18,12 @@ const BookDetail = ({ user }) => {
           const res = await axiosInstance.get(`/api/book/${id}`);
           setBook(res.data);
         }
-      } catch (error) {
-        console.error("Error fetching book:", error);
+      } catch (err) {
+        const msg =
+          err.response?.data?.error ||
+          err.response?.data?.detail ||
+          "Failed to load book.";
+        setError(typeof msg === "string" ? msg : JSON.stringify(msg));
       } finally {
         setLoading(false);
       }
@@ -31,8 +36,13 @@ const BookDetail = ({ user }) => {
     try {
       await axiosInstance.delete(`/api/books/${id}/`);
       navigate("/librarian-dashboard");
-    } catch (error) {
-      console.error("Delete failed:", error);
+    } catch (err) {
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        Object.values(err.response?.data || {})[0] ||
+        "Failed to delete book.";
+      setError(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
   };
 
@@ -41,6 +51,16 @@ const BookDetail = ({ user }) => {
 
   return (
     <div className="container mt-4">
+      {error && (
+        <div className="alert alert-danger alert-dismissible" role="alert">
+          {error}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError("")}
+          />
+        </div>
+      )}
       <div className="card shadow-sm border-0 p-4">
         <div className="row">
           {/* LEFT SIDE */}

@@ -66,7 +66,7 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.create(serializer.validated_data)
-            return Response('User registered successfully.', status=status.HTTP_201_CREATED)
+            return Response({"success": "User registered successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -118,7 +118,7 @@ class BooksView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             book.delete()
-            return Response(f"Book '{book.title}' deleted successfully.", status=status.HTTP_200_OK)
+            return Response({"success": f"Book '{book.title}' deleted successfully."}, status=status.HTTP_200_OK)
         except Book.DoesNotExist:
             return Response(
                 {"error": "Book not found"},
@@ -239,7 +239,7 @@ class DeleteReaderView(APIView):
 
         name = reader.full_name
         reader.delete()
-        return Response({"message": f"Reader '{name}' deleted successfully."},
+        return Response({"success": f"Reader '{name}' deleted successfully."},
                         status=status.HTTP_200_OK)
 
 
@@ -262,11 +262,11 @@ class IssueBookView(APIView):
 
             # Scenario handling validation guardrails
             if book.available_copies < 1:
-                return Response(f"Operation Denied: '{book.title}' is completely checked out.",
+                return Response({"error": f"Operation Denied: '{book.title}' is completely checked out."},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             if BorrowRecord.objects.filter(user=reader, book=book, status=BorrowRecord.StatusChoices.BORROWED).exists():
-                return Response(f"User {username} currently holds an unreturned copy of this volume.",
+                return Response({"error": f"User {username} currently holds an unreturned copy of this volume."},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             book.available_copies -= 1
@@ -277,7 +277,7 @@ class IssueBookView(APIView):
                 book=book,
                 due_date=timezone.now().date() + datetime.timedelta(days=14)  # 2-Week standard checkout period
             )
-            return Response(f"Success: '{book.title}' effectively provisioned out to user {username}.",
+            return Response({"success": f"{book.title}' effectively provisioned out to user {username}."},
                             status=status.HTTP_200_OK)
 
 
@@ -295,8 +295,8 @@ class ReturnBookView(APIView):
             record = get_object_or_404(BorrowRecord.objects.select_for_update(), id=pk)
 
             if record.status == BorrowRecord.StatusChoices.RETURNED:
-                return Response(
-                    f"The book {record.book.title} issued by {record.user.full_name} has already been returned.",
+                return Response({"error":
+                    f"The book {record.book.title} issued by {record.user.full_name} has already been returned."},
                     status=status.HTTP_400_BAD_REQUEST)
 
             book = record.book
@@ -311,6 +311,6 @@ class ReturnBookView(APIView):
             current_fine = record.calculate_fine
             record.final_fine_amount = current_fine
             record.save()
-            return Response(f"{book.title}' checked back into inventory cleanly.", status=status.HTTP_200_OK)
+            return Response({"success": f"{book.title}' checked back into inventory cleanly."}, status=status.HTTP_200_OK)
 
 
